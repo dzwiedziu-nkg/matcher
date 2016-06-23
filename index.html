@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Students Matcher</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<style>
+    textarea {
+        white-space: pre;
+        word-wrap: normal;
+    }
+</style>
+
+<body>
+
+<div class="container" role="main">
+    <div class="jumbotron">
+        <h1>Students Matcher</h1>
+        <p>To jest prosty skrypt który ma na celu dopasować oceny z kolokwium na ELF2 do listy studentów. Wynik jest w postaci łatwo wklejalnej do arkusza kalkulacyjnego.</p>
+    </div>
+
+    <div class="page-header">
+        <h1>Wejście</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-xs-12">
+            <div class="well">
+                <p>Tu wklej plik CSV z listą ocen wyeksportowaną w ELF2.<br/>
+                    <strong>Uwaga!</strong> Skala punktacji w kolokwium elfowym musi być do 10 punktów bo takiej wartości jest potem przeliczana ocena.</p>
+            </div>
+            <div class="form-group">
+                <label for="csv">CSV:</label>
+                <textarea class="form-control" rows="18" id="csv"></textarea>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-xs-12">
+            <div class="well">
+                <p>Tu wklej imiona i nazwiska skopiowane z arkusza kalkulacyjnego.<br/>
+                    <strong>Uwaga!</strong> Jak nie znalazło studenta o może być tak, że imię lub nazwisko zostało źle wpisane.</p>
+            </div>
+            <div class="form-group">
+                <label for="students">Lista:</label>
+                <textarea class="form-control" rows="18" id="students"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-lg btn-primary" id="generate">Generuj wynik</button>
+
+    <div class="page-header">
+        <h1>Wyjście</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-xs-12">
+            <div class="well">
+                <p>Wygenerowane oceny możesz teraz przekleić do arkusza kalkulacyjnego.<br/>
+                    <strong>Uwaga!</strong> Jeżeli nie znaleziono oceny studenta to wtedy zamiast oceny widnieje &quot;not found&quot;, więc kolejność dalszych ocen się zgadza. Jeżeli pojawiła się wartość &quot;error&quot; to znaczy, że nie udało się znaleźć oceny. Tak się dzieje np. gdy kolokwium jeszcze nie zostało ocenione.</p>
+            </div>
+            <div class="form-group">
+                <label for="grades">Oceny:</label>
+                <textarea class="form-control" rows="18" id="grades"></textarea>
+            </div>
+                <p>Oceny są przeliczane wg:<br/>
+                    (&infin;;9)&rarr;5.0<br/>
+                    [9;8)&rarr;4.5<br/>
+                    [8;7)&rarr;4.0<br/>
+                    [7;6)&rarr;3.5<br/>
+                    [6;5)&rarr;3.0<br/>
+                    [5;-&infin;)&rarr;2.0</p>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted"><a href="https://github.com/dzwiedziu-nkg/matcher">Students Matcher</a> v0.1 <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPL 3.0</a><br/>
+            Copyright &copy; by Michał Niedźwiecki 2016</p>
+    </div>
+</footer>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+
+<script src="csvtoarray.js"></script>
+
+<script>
+    function decodeGrade(points) {
+        var p = points.replace(',', '.');
+
+        if (!jQuery.isNumeric(p)) {
+            return "error";
+        }
+
+        if (p > 9) {
+            return "5.0";
+        } else if (p > 8) {
+            return "4.5";
+        } else if (p > 7) {
+            return "4.0";
+        } else if (p > 6) {
+            return "3.5";
+        } else if (p > 5) {
+            return "3.0";
+        } else {
+            return "2.0";
+        }
+    }
+
+    $(function(){
+        $('#generate').on('click', function(e){
+            e.preventDefault(); // prevent the default click action
+
+            var csv = $("textarea#csv").val().split('\n');
+            var students = $("textarea#students").val().split('\n');
+            var result = "";
+
+            for (var i = 0; i < students.length; i++) {
+                var names = students[i].toLowerCase().split(/[-\s]+/);
+                var found = 0;
+
+                for (var j = 0; j < csv.length; j++) {
+                    var line = csv[j].toLowerCase();
+                    var founds = 0;
+
+                    for (var k = 0; k < names.length; k++) {
+                        if (line.indexOf(names[k]) > -1) {
+                            founds++;
+                        }
+                    }
+
+                    if (founds == names.length) {
+                        found = 1;
+
+                        var decoded = CSVToArray(line, ",");
+                        var points = decoded[0][9];
+                        result += decodeGrade(points) + "\n";
+
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    result += "not found\n";
+                }
+            }
+
+            $("textarea#grades").val(result);
+        });
+    });
+</script>
+
+</body>
+</html>

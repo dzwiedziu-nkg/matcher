@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Students Matcher</title>
+    <title>Students Homework Finder</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
@@ -34,8 +34,8 @@
 
 <div class="container" role="main">
     <div class="jumbotron">
-        <h1>Students Matcher</h1>
-        <p>To jest prosty skrypt który ma na celu dopasować oceny z kolokwium na ELF2 do listy studentów. Wynik jest w postaci łatwo wklejalnej do arkusza kalkulacyjnego.</p>
+        <h1>Students Homework Finder</h1>
+        <p>To jest prosty skrypt który ma na celu dopasować oddane zadania domowe na ELF2 do listy studentów. Wynik jest w postaci łatwo wklejalnej do arkusza kalkulacyjnego.</p>
     </div>
 
     <div class="page-header">
@@ -45,8 +45,7 @@
     <div class="row">
         <div class="col-lg-6 col-xs-12">
             <div class="well">
-                <p>Tu wklej plik CSV z listą ocen wyeksportowaną w ELF2.<br/>
-                    <strong>Uwaga!</strong> Skala punktacji w kolokwium elfowym musi być do 10 punktów bo takiej wartości jest potem przeliczana ocena.</p>
+                <p>Tu wklej to co z listy oddanych sprawozdań na ELF2 skopwiowałeś metodą CTRL+A i CTRL+C:<br/><br/></p>
             </div>
             <div class="form-group">
                 <label for="csv">CSV:</label>
@@ -56,8 +55,8 @@
 
         <div class="col-lg-6 col-xs-12">
             <div class="well">
-                <p>Tu wklej imiona i nazwiska skopiowane z arkusza kalkulacyjnego.<br/>
-                    <strong>Uwaga!</strong> Jak nie znalazło studenta o może być tak, że imię lub nazwisko zostało źle wpisane.</p>
+                <p>Tu wklej imiona i nazwiska skopiowane z arkusza kalkulacyjnego:<br/>
+                    <strong>Uwaga!</strong> Jak nie znalazło zadania domowego studenta to może być tak, że imię lub nazwisko zostało źle wpisane.</p>
             </div>
             <div class="form-group">
                 <label for="students">Lista:</label>
@@ -79,16 +78,19 @@
                     <strong>Uwaga!</strong> Jeżeli nie znaleziono oceny studenta to wtedy zamiast oceny widnieje &quot;not found&quot;, więc kolejność dalszych ocen się zgadza. Jeżeli pojawiła się wartość &quot;error&quot; to znaczy, że nie udało się znaleźć oceny. Tak się dzieje np. gdy kolokwium jeszcze nie zostało ocenione.</p>
             </div>
             <div class="form-group">
-                <label for="grades">Oceny:</label>
-                <textarea class="form-control" rows="18" id="grades"></textarea>
+                <div class="col-lg-3 col-xs-3">
+                    <label for="names">Nazwiska:</label>
+                    <textarea class="form-control" rows="18" id="names"></textarea>
+                </div>
+                <div class="col-lg-9 col-xs-9">
+                    <label for="grades">Wynik:</label>
+                    <textarea class="form-control" rows="18" id="grades"></textarea>
+                </div>
             </div>
-                <p>Oceny są przeliczane wg:<br/>
-                    (&infin;;9)&rarr;5.0<br/>
-                    [9;8)&rarr;4.5<br/>
-                    [8;7)&rarr;4.0<br/>
-                    [7;6)&rarr;3.5<br/>
-                    [6;5)&rarr;3.0<br/>
-                    [5;-&infin;)&rarr;2.0</p>
+                <p><strong>Legenda:</strong><br/>
+                    <strong>ok</strong>&rarr;znaleziono zadanie domowe<br/>
+                    <strong>2</strong>&rarr;nie znaleziono zadania domowego<br/>
+                    <strong>not found</strong>&rarr;znaleziono studenta (sprawdź czy imię i nazwisko są poprawne)</p>
         </div>
     </div>
 </div>
@@ -111,27 +113,6 @@
 <script src="csvtoarray.js"></script>
 
 <script>
-    function decodeGrade(points) {
-        var p = points.replace(',', '.');
-
-        if (!jQuery.isNumeric(p)) {
-            return "error";
-        }
-
-        if (p > 90) {
-            return "5.0";
-        } else if (p > 80) {
-            return "4.5";
-        } else if (p > 70) {
-            return "4.0";
-        } else if (p > 60) {
-            return "3.5";
-        } else if (p > 50) {
-            return "3.0";
-        } else {
-            return "2.0";
-        }
-    }
 
     $(function(){
         $('#generate').on('click', function(e){
@@ -140,10 +121,12 @@
             var csv = $("textarea#csv").val().split('\n');
             var students = $("textarea#students").val().split('\n');
             var result = "";
+            var names2 = "";
 
             for (var i = 0; i < students.length; i++) {
                 var names = students[i].toLowerCase().split(/[-\s]+/);
                 var found = 0;
+                var exist = 0;
 
                 for (var j = 0; j < csv.length; j++) {
                     var line = csv[j].toLowerCase();
@@ -156,24 +139,26 @@
                     }
 
                     if (founds == names.length) {
-                        found = 1;
-
-                        if (j+3 < csv.length && csv[j+3].indexOf("Dokument formatu") !== -1) {
-                            result += "ok\n";
-                        } else {
-                            result += "2\n";
+                        exist = 1;
+                        if (j+3 < csv.length && csv[j+3].length > 5) {
+                            found = 1;
                         }
-
-                        break;
                     }
                 }
 
-                if (!found) {
+                if (found) {
+                    result += "ok\n";
+                } else if (exist) {
                     result += "2\n";
+                } else {
+                    result += "not found\n";
                 }
+
+                names2 += students[i] + "\n";
             }
 
             $("textarea#grades").val(result);
+            $("textarea#names").val(names2);
         });
     });
 </script>

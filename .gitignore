@@ -1,2 +1,4 @@
 .idea
 publish.sh
+node_modules
+src/client/js

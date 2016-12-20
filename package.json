@@ -1,0 +1,39 @@
+{
+  "name": "elf2-matcher",
+  "version": "0.0.1",
+  "description": "Help to export gradues from ELF2 to spreadsheet",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack -d --watch",
+    "build": "webpack -p"
+  },
+  "author": "Michal Niedzwiecki (dzwiedziu-nkg)",
+  "license": "GPLv3",
+  "dependencies": {
+    "webpack": "~1.14.0",
+    "babel-preset-react": "~6.16.0",
+    "babel-core": "~6.21.0",
+    "babel-loader": "~6.2.10",
+    "babel-preset-es2015": "~6.18.0",
+    "react": "~15.4.1",
+    "react-dom": "~15.4.1",
+    "bootstrap": "~3.3.7",
+    "react-bootstrap": "~0.30.7"
+  },
+  "devDependencies": {
+    "babel-core": "~6.21.0",
+    "babel-loader": "~6.2.10",
+    "babel-preset-es2015": "~6.18.0",
+    "bootstrap-webpack": "0.0.5",
+    "css-loader": "~0.26.1",
+    "exports-loader": "^0.6.3",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "~0.9.0",
+    "imports-loader": "^0.7.0",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "style-loader": "~0.13.1",
+    "url-loader": "~0.5.7",
+    "webpack": "~1.14.0"
+  }
+}
